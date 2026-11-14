@@ -83,14 +83,22 @@ class StripePaymentGateway implements PaymentGateway {
   @override
   Future<SavedCard> tokenizeCard({bool makeDefault = false}) async {
     await _configure();
-    final setup = await client.post('/payment-methods/setup-intent');
-    await Stripe.instance.confirmSetupIntent(
-      paymentIntentClientSecret: setup['setup_intent_client_secret'] as String,
+    // Solo tokeniza y adjunta la tarjeta al cliente: no cobra ni valida
+    // fondos. Un saldo insuficiente se detecta hasta intentar el pago.
+    final method = await Stripe.instance.createPaymentMethod(
       params: PaymentMethodParams.card(
         paymentMethodData: PaymentMethodData(),
       ),
     );
+    await client.post('/payment-methods', {
+      'payment_method_id': method.id,
+    });
     final cards = await fetchCards();
+    for (final card in cards) {
+      if (card.id == method.id) {
+        return card;
+      }
+    }
     if (cards.isEmpty) {
       throw const PaymentDeclined('Stripe no devolvió la tarjeta guardada.');
     }
