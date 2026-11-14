@@ -13,7 +13,8 @@
 - El gateway se selecciona en el API (`PAYMENT_GATEWAY`), nunca desde un selector del alumno. Flutter solo implementa el cliente/estrategia de pago.
 - El importe de la demo lo define el API: `DEMO_PAYMENT_AMOUNT_CENTS=1000` y `PAYMENT_CURRENCY=mxn` ($10 MXN). No confíes en un importe enviado por el cliente.
 - Para pruebas usa solo llaves Stripe `sk_test`/`pk_test` y tarjetas de prueba oficiales. Cada checkout confirmado crea un PaymentIntent y una fila nueva; advierte antes de crear cargos adicionales o borrar tarjetas/pagos de prueba.
-- No registres PAN/CVC. Las tarjetas se ingresan en Stripe PaymentSheet; School Control conserva identificadores y metadatos.
+- No registres PAN/CVC. Las tarjetas se capturan con `CardField` de Stripe dentro de un layout propio de la app; School Control conserva identificadores y metadatos.
+- No uses el PaymentSheet predeterminado ni el flujo "Pay with Link" de Stripe en la app Flutter: el formulario y la selección de tarjetas son propios.
 - El API local configura `STRIPE_API_VERSION=2026-10-28.endive`; no lo cambies sin verificar compatibilidad de SetupIntent/PaymentIntent.
 - La base local tiene estado demo persistente. No reinicies ni migres destructivamente sin revisar antes las migraciones y los datos existentes.
 
@@ -25,7 +26,7 @@
 - Emulador de prueba observado: `emulator-5554`. Antes de crear otra VM, revisa `adb devices -l` y reutiliza la ya activa; evita arrancar emuladores duplicados.
 - Para la app: `fvm flutter pub get`, `fvm flutter analyze`, `fvm flutter test` y, si aplica, `fvm flutter build apk --debug --flavor norte --dart-define=NORTE_API_URL=http://10.0.2.2:8000`.
 - El Vite de School Control (`npm run dev`) sirve assets del portal web; no es el API ni hace falta para ejecutar la app Android.
-- La grabación validada está en `demo-video/stripe-android-demo.mp4`. `screenrecord` limita cada segmento a 180 segundos; FFmpeg se usó para concatenar segmentos H.264 sin recodificarlos.
+- La grabación validada está en `demo/video/stripe-android-demo.mp4`. `screenrecord` limita cada segmento a 180 segundos; FFmpeg se usó para concatenar segmentos H.264 sin recodificarlos.
 
 ## Cambios y validación
 

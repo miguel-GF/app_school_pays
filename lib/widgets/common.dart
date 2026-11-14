@@ -77,6 +77,85 @@ class EmptyState extends StatelessWidget {
   }
 }
 
+/// Distintivo compacto de la marca de una tarjeta.
+///
+/// Stripe entrega marcas como "visa", "mastercard" o "american_express";
+/// aquí solo se muestran como una etiqueta legible, nunca datos sensibles.
+class CardBrandBadge extends StatelessWidget {
+  const CardBrandBadge({super.key, required this.brand});
+
+  final String brand;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final normalized = brand.toLowerCase().replaceAll(RegExp(r'[\s_]'), '');
+    final (String label, Color color) = switch (normalized) {
+      'visa' => ('VISA', const Color(0xFF1A1F71)),
+      'mastercard' => ('MC', const Color(0xFFEB001B)),
+      'americanexpress' || 'amex' => ('AMEX', const Color(0xFF006FCF)),
+      'discover' => ('DISC', const Color(0xFFFF6000)),
+      'jcb' => ('JCB', const Color(0xFF0B4EA2)),
+      'diners' || 'dinersclub' => ('DINERS', const Color(0xFF0079BE)),
+      'unionpay' => ('UP', const Color(0xFFE21836)),
+      _ => ('CARD', scheme.primary),
+    };
+
+    return Container(
+      width: 48,
+      height: 32,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: label.length > 4 ? 9 : 11,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.4,
+        ),
+      ),
+    );
+  }
+}
+
+/// Aviso de error con el mismo estilo en todas las pantallas de pago.
+class ErrorBanner extends StatelessWidget {
+  const ErrorBanner({super.key, required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.error_outline, color: scheme.onErrorContainer, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(color: scheme.onErrorContainer, height: 1.3),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Fila "etiqueta / valor" para recibos y resúmenes.
 class InfoRow extends StatelessWidget {
   const InfoRow({

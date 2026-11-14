@@ -65,8 +65,8 @@ El artefacto queda en `build/app/outputs/flutter-apk/app-norte-debug.apk`. Para 
 
 - El login `POST /api/v1/mobile/auth/login` autentica la matrícula en School Control y entrega un token Sanctum.
 - La app obtiene el importe y la configuración de pasarela de `GET /api/v1/mobile/payment-config`.
-- Stripe PaymentSheet guarda tarjetas mediante SetupIntent. El PAN y CVC se capturan en la interfaz segura de Stripe; el API conserva referencias y metadatos, no el número/CVC.
-- El API crea el PaymentIntent con monto del servidor (en esta demo, `1000` centavos MXN), la app lo confirma con PaymentSheet y consulta la confirmación al backend.
+- La app usa un layout de pago propio con `CardField` de Stripe (sin PaymentSheet ni "Pay with Link"): el alumno elige una tarjeta guardada o captura una nueva en la misma pantalla. El PAN y CVC se capturan en el componente nativo de Stripe; el API conserva referencias y metadatos, no el número/CVC.
+- Para guardar una tarjeta se confirma un SetupIntent; para cobrar, el API crea el PaymentIntent con monto del servidor (en esta demo, `1000` centavos MXN) y la app lo confirma con `confirmPayment`, usando la tarjeta seleccionada o el `CardField`. Después consulta la confirmación al backend.
 - Las rutas protegidas incluyen `GET/POST /api/v1/mobile/payments`, `GET /api/v1/mobile/payment-methods`, `POST /api/v1/mobile/payment-methods/setup-intent` y `DELETE /api/v1/mobile/payment-methods/{paymentMethodId}`. El webhook Stripe es `POST /api/v1/mobile/payments/stripe/webhook`.
 - Persistencia local: `payment_customers`, `payments` y `payment_attempts`. El historial de la app refleja solo pagos confirmados.
 
@@ -83,7 +83,7 @@ Al terminar la grabación de este demo, la base muestra una tarjeta Visa termina
 
 ## Video demo
 
-El video verificado está en `demo-video/stripe-android-demo.mp4` (Android vertical, 1080 × 2400). Muestra login, alta de Visa de prueba, checkout Stripe de $10, comprobante e historial. Se grabó en el emulador existente `emulator-5554`, sin iniciar una segunda máquina virtual; API y MySQL corrieron localmente.
+El video verificado está en `demo/video/stripe-android-demo.mp4` (Android vertical, 1080 × 2400). Muestra login, alta de Visa de prueba, checkout Stripe de $10, comprobante e historial. Se grabó en el emulador existente `emulator-5554`, sin iniciar una segunda máquina virtual; API y MySQL corrieron localmente.
 
 ADB `screenrecord` limita cada segmento a 180 segundos. Para repetir una grabación larga, registra segmentos y cópialos con `adb pull`. Si se necesita unirlos, FFmpeg puede concatenar segmentos H.264 compatibles sin recodificar:
 

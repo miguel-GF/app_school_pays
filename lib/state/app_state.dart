@@ -70,6 +70,13 @@ class AppState extends ChangeNotifier {
     student = await api.login(matricula: matricula, password: password);
     biometricAvailable = await biometrics.isAvailable();
     locked = false;
+    // Deja lista la llave publicable antes de abrir cualquier formulario de
+    // tarjeta. Si falla, la pantalla de pago vuelve a intentarlo.
+    try {
+      await gateway.prepare();
+    } catch (_) {
+      // Sin conexión o configuración pendiente: se reintenta al pagar.
+    }
     try {
       testAmountCents = await gateway.fetchTestAmountCents();
     } catch (_) {
@@ -166,6 +173,20 @@ class AppState extends ChangeNotifier {
     return savedCard;
   }
 
+  /// Vuelve a consultar las tarjetas guardadas en la pasarela.
+  Future<void> refreshCards() async {
+    cards
+      ..clear()
+      ..addAll(await gateway.fetchCards());
+    if (cards.isEmpty) {
+      defaultCardId = null;
+    } else if (defaultCardId == null ||
+        !cards.any((card) => card.id == defaultCardId)) {
+      defaultCardId = cards.first.id;
+    }
+    notifyListeners();
+  }
+
   Future<void> removeCard(String id) async {
     await gateway.removeCard(id);
     cards.removeWhere((c) => c.id == id);
@@ -182,14 +203,27 @@ class AppState extends ChangeNotifier {
 
   // ---------- Pagos ----------
 
-  Future<Payment> payWithCard(Charge charge) async {
+  Future<Payment> payWithCard(
+    Charge charge, {
+    String? cardId,
+    String? cardLabel,
+  }) async {
     final result = await gateway.chargeCard(
       amount: charge.amount,
       description: '${charge.concept} · ${charge.period}',
+      paymentMethodId: cardId,
     );
+    if (cardId == null) {
+      // Una tarjeta nueva se guarda en el cliente durante el cobro.
+      try {
+        await refreshCards();
+      } catch (_) {
+        // El pago ya se completó; la lista se actualiza en el siguiente acceso.
+      }
+    }
     return _registerPayment(
       charge,
-      method: 'Tarjeta',
+      method: cardLabel ?? 'Tarjeta',
       folio: result.folio,
       date: result.date,
     );

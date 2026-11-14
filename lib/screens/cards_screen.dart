@@ -54,10 +54,10 @@ class CardsScreen extends StatelessWidget {
               children: [
                 for (final card in state.cards)
                   ListTile(
-                    leading: const Icon(Icons.credit_card),
+                    leading: CardBrandBadge(brand: card.brand),
                     title: Text(card.label),
                     subtitle: Text(
-                      '${card.holder} · vence ${card.expiry}'
+                      'Vence ${card.expiry}'
                       '${card.id == state.defaultCardId ? ' · Predeterminada' : ''}',
                     ),
                     trailing: PopupMenuButton<String>(
