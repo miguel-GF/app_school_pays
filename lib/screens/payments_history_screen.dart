@@ -12,27 +12,30 @@ class PaymentsHistoryScreen extends StatelessWidget {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Comprobante de pago',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
-              InfoRow(label: 'Monto', value: formatMoney(payment.amount)),
-              InfoRow(label: 'Concepto', value: payment.concept),
-              InfoRow(label: 'Método', value: payment.method),
-              if (payment.gateway != null)
-                InfoRow(label: 'Pasarela', value: payment.gateway!),
-              InfoRow(label: 'Folio', value: payment.folio),
-              InfoRow(label: 'Fecha', value: formatDateTime(payment.date)),
-            ],
-          ),
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+      ),
+      builder: (context) => SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Comprobante de pago',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            InfoRow(label: 'Monto', value: formatMoney(payment.amount)),
+            InfoRow(label: 'Concepto', value: payment.concept),
+            InfoRow(label: 'Método', value: payment.method),
+            if (payment.gateway != null)
+              InfoRow(label: 'Pasarela', value: payment.gateway!),
+            InfoRow(label: 'Folio', value: payment.folio),
+            InfoRow(label: 'Fecha', value: formatDateTime(payment.date)),
+          ],
         ),
       ),
     );
