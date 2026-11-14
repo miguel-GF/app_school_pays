@@ -10,6 +10,12 @@ Capturas del layout propio de pago, sin PaymentSheet ni "Pay with Link":
 - `screenshots/demo-custom-newcard.png`: formulario de tarjeta nueva dentro del checkout.
 - `screenshots/demo-custom-addcard.png`: pantalla "Agregar tarjeta" con vista previa.
 
+## Historial de pagos
+
+- `screenshots/payments-history.png`: pestaña "Mis pagos" leyendo la tabla principal
+  `payments` y mostrando método y pasarela (`Stripe`).
+- `screenshots/payment-detail.png`: comprobante con folio, fecha y pasarela.
+
 ## Capturas previas
 
 El resto de `screenshots/` son capturas de la etapa anterior del demo (PaymentSheet

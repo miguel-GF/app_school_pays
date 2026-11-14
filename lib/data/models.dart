@@ -51,6 +51,7 @@ class Payment {
     required this.date,
     required this.method,
     required this.folio,
+    this.gateway,
   });
 
   final String id;
@@ -61,6 +62,9 @@ class Payment {
 
   /// Texto para mostrar: "Visa •••• 4242", "Transferencia SPEI".
   final String method;
+
+  /// Pasarela que procesó el pago: "Stripe", "SPEI", etc.
+  final String? gateway;
   final String folio;
 }
 

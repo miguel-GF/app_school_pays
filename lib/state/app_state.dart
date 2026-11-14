@@ -224,6 +224,7 @@ class AppState extends ChangeNotifier {
     return _registerPayment(
       charge,
       method: cardLabel ?? 'Tarjeta',
+      gateway: 'Stripe',
       folio: result.folio,
       date: result.date,
     );
@@ -247,6 +248,7 @@ class AppState extends ChangeNotifier {
     return _registerPayment(
       charge,
       method: 'Transferencia SPEI',
+      gateway: 'SPEI',
       folio: 'F-${_folioSequence.toString().padLeft(6, '0')}',
       date: DateTime.now(),
     );
@@ -257,6 +259,7 @@ class AppState extends ChangeNotifier {
     required String method,
     required String folio,
     required DateTime date,
+    String? gateway,
   }) {
     charge.paid = true;
     final payment = Payment(
@@ -266,6 +269,7 @@ class AppState extends ChangeNotifier {
       amount: charge.amount,
       date: date,
       method: method,
+      gateway: gateway,
       folio: folio,
     );
     // Se inserta en la misma lista que entregó la API para que la demo

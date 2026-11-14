@@ -100,6 +100,7 @@ class MockSchoolApi implements SchoolApi {
         amount: 4850,
         date: now.subtract(const Duration(days: 33)),
         method: 'Transferencia SPEI',
+        gateway: 'SPEI',
         folio: 'F-000128',
       ),
       Payment(
@@ -109,6 +110,7 @@ class MockSchoolApi implements SchoolApi {
         amount: 4850,
         date: now.subtract(const Duration(days: 64)),
         method: 'Visa •••• 4242',
+        gateway: 'Stripe',
         folio: 'F-000097',
       ),
     ];
@@ -163,16 +165,42 @@ class HttpSchoolApi implements SchoolApi {
       final paidAt = DateTime.tryParse(item['paid_at']?.toString() ?? '') ??
           DateTime.tryParse(item['created_at']?.toString() ?? '') ??
           DateTime.now();
+      final description = item['description']?.toString().trim() ?? '';
       return Payment(
         id: item['id'].toString(),
         chargeId: item['id'].toString(),
-        concept: 'Pago de prueba',
+        concept: description.isEmpty ? 'Pago escolar' : description,
         amount: (item['amount_cents'] as num).toDouble() / 100,
         date: paidAt,
-        method: item['payment_method']?.toString() == 'card' ? 'Tarjeta' : 'Pago',
+        method: _paymentMethodLabel(item['payment_method']?.toString()),
+        gateway: _gatewayLabel(item['gateway']?.toString()),
         folio: item['folio']?.toString() ?? item['id'].toString(),
       );
     }).toList();
+  }
+
+  String _paymentMethodLabel(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Pago';
+    }
+    if (value == 'card') {
+      return 'Tarjeta';
+    }
+    if (value == 'transfer' || value == 'spei') {
+      return 'Transferencia SPEI';
+    }
+    return '${value[0].toUpperCase()}${value.substring(1)}';
+  }
+
+  String? _gatewayLabel(String? value) {
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+    return switch (value.toLowerCase()) {
+      'stripe' => 'Stripe',
+      'spei' => 'SPEI',
+      _ => '${value[0].toUpperCase()}${value.substring(1)}',
+    };
   }
 
   @override

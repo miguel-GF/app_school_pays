@@ -64,6 +64,8 @@ class PaymentSuccessScreen extends StatelessWidget {
                     children: [
                       InfoRow(label: 'Concepto', value: payment.concept),
                       InfoRow(label: 'Método', value: payment.method),
+                      if (payment.gateway != null)
+                        InfoRow(label: 'Pasarela', value: payment.gateway!),
                       InfoRow(label: 'Folio', value: payment.folio),
                       InfoRow(
                         label: 'Fecha',

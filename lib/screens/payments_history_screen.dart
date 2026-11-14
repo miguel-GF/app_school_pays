@@ -27,6 +27,8 @@ class PaymentsHistoryScreen extends StatelessWidget {
               InfoRow(label: 'Monto', value: formatMoney(payment.amount)),
               InfoRow(label: 'Concepto', value: payment.concept),
               InfoRow(label: 'Método', value: payment.method),
+              if (payment.gateway != null)
+                InfoRow(label: 'Pasarela', value: payment.gateway!),
               InfoRow(label: 'Folio', value: payment.folio),
               InfoRow(label: 'Fecha', value: formatDateTime(payment.date)),
             ],
@@ -81,7 +83,11 @@ class PaymentsHistoryScreen extends StatelessWidget {
                       ),
                       title: Text(payment.concept),
                       subtitle: Text(
-                        '${formatDate(payment.date)} · ${payment.method}',
+                        [
+                          formatDate(payment.date),
+                          payment.method,
+                          if (payment.gateway != null) payment.gateway!,
+                        ].join(' · '),
                       ),
                       trailing: Text(
                         formatMoney(payment.amount),
